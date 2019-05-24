@@ -11,15 +11,21 @@
 			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
 			crossorigin="anonymous"
 		/>
-    
+    <script
+			defer
+			src="https://use.fontawesome.com/releases/v5.7.2/js/all.js"
+			integrity="sha384-0pzryjIRos8mFBWMzSSZApWtPl/5++eIfzYmTgBBmXYdhvxPc+XcFEk+zJwDgWbP"
+			crossorigin="anonymous"
+		></script>
 </head>
 <body>
     <nav class="navbar navbar-dark bg-dark">
 			<span class="navbar-brand mb-0 h1">Xpers</span>
+            <span class="navbar-brand mb-0 h1" id="headingTotal"></span>
 		</nav>
     <div class="container-fluid bg-light" style="min-height: 100vh">
             <div class="container">
-                <h1 id="headingTotal"></h1>
+        
                     <div class="jumbotron mt-4">
 					<div class="input-group mb-3">
 						<input
@@ -51,8 +57,12 @@
 						</div>
 					</div>
 				</div>
+                <div>
+					<ul class="list-group" id="expenseTable"> 
+                        
+                    </ul>
+                </div>
                 
-                <div id="expenseTable"></div>
             </div>
             
     </div>
@@ -99,6 +109,7 @@
                 // put it in object
                 expenseItem.desc= textDesc;
                 expenseItem.amount=expense;
+                expenseItem.moment=new Date();
 
                 allExpenses.push(expenseItem);
 
@@ -122,16 +133,7 @@
                 //     <div>${data2Text}</div>
                 // `
 
-                const allExpenseHTML = allExpenses.map(expense=>{
-                    return `<div>${expense.amount} :: ${expense.desc}</div>`
-                });
-
-                const joinedAllExpenseHTML = allExpenseHTML.join("");
-
-                console.log(joinedAllExpenseHTML);
-                
-
-                expenseTableEl.innerHTML = joinedAllExpenseHTML;
+                renderList(allExpenses);
         }
                 
 
@@ -142,7 +144,64 @@
         //LISTEN TO CLICK EVENT
          element.addEventListener("click",addExpenseToTotal,false);
         
+        //  Controller Functions
+            // Get Date String
+            function getDateString(moment){
+                    return moment.toLocaleDateString('en-US',{
+                        year:'numeric' ,
+                        month: 'long' , 
+                        day: 'numeric'
+                        })
+                    }
+            // Delete Items
+
+            function deleteitem(dateValue){
+                // const newArr = [];
+                // for(let i=0; i < allExpenses.length ; i++ ){
+                //     if(allExpenses[i].moment.valueOf() !== dateValue){
+                //          newArr.push(allExpenses[i]);
+                //       }
+                                // OR
+                // }
+                    // const newArr =allExpenses.filter(expense=>{
+                    //     if(expense.moment.valueOf() !== dateValue){
+                    //         return expense;
+                    //     }
+                    // })
+                                // OR
+                const newArr = allExpenses.filter(expense => expense.moment.valueOf() !== dateValue)
+                renderList(newArr);
+            }
         
+        // view layer
+        function renderList(arrOfList){
+                const allExpenseHTML = arrOfList.map(expense=>createListItem(expense));
+                const joinedAllExpenseHTML = allExpenseHTML.join('');
+                expenseTableEl.innerHTML = joinedAllExpenseHTML;
+
+        }
+
+        function createListItem({ desc , amount , moment}){
+                return `<li class="list-group-item d-flex justify-content-between">
+							<div class="d-flex flex-column">
+								${desc}
+								<small class="text-muted">${getDateString(moment)}</small>
+							</div>
+							<div>
+								<span class="px-5">
+									${amount}
+								</span>
+								<button 
+                                type="button" 
+                                class="btn btn-outline-danger btn-sm"
+                                onClick="deleteitem(${moment.valueOf()})"
+                                >
+									<i class="fas fa-trash-alt"></i>
+								</button>
+							</div>
+						</li>`
+
+        }        
 
         </script>
 </body>
